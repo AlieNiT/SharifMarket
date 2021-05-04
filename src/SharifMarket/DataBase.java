@@ -1,17 +1,15 @@
 package SharifMarket;
-import com.google.gson.Gson;
-
+import com.google.gson.*;
 import java.io.*;
 import java.util.ArrayList;
 public class DataBase {
     private ArrayList<Good> goods = new ArrayList<>();
-    private ArrayList<User> users = new ArrayList<>();
-    private ArrayList<Admin> admins = new ArrayList<>();
+    public ArrayList<User> users = new ArrayList<>();
+    public ArrayList<Admin> admins = new ArrayList<>();
     private ArrayList<Order> ordersHistory = new ArrayList<>();
     private ArrayList<Order> uncheckedOrders = new ArrayList<>();
     private int P = 0;
     private int S = 0;
-    boolean hasRead = false;
     public ArrayList<Order> getUncheckedOrders(){ return uncheckedOrders; }
     public void checkOut(int ID){
         for (Order order : uncheckedOrders)
@@ -56,14 +54,16 @@ public class DataBase {
                 p += order.count*(order.sellPrice - order.buyPrice);
         return p;
     }
-    public boolean userExists(int s) {
+    public boolean userExists(String s) {
         for (User user:users) {
-            if(user.ID == s)
+
+            if((user.ID).equals(s))
                 return true;
+            System.out.println(user.ID + " != " + s);
         }
         return false;
     }
-    public User getUser(int s) {
+    public User getUser(String s) {
         for (User user:users) {
             if(user.ID == s)
                 return user;
@@ -84,10 +84,10 @@ public class DataBase {
         }
         return false;
     }
-    public String addGood(String s, int initialCount, int sellPrice, int buyPrice, String unit) {
+    public String addGood(String s, int initialCount, int sellPrice, int buyPrice) {
         if(goodExists(s))
             return "The good already exists.";
-        Good good = new Good(s,initialCount,sellPrice,buyPrice,unit);
+        Good good = new Good(s,initialCount,sellPrice,buyPrice);
         goods.add(good);
         return "add was successful -> good_id = "+good.ID;
     }
@@ -127,7 +127,7 @@ public class DataBase {
         }
         return orders+" orders, "+totalSells+" "+good.name+"s, "+sell+" IRR sell, "+profit+" IRR profit";
     }
-    public String makeOrder(int ID, int count, int buyerID) {
+    public String makeOrder(int ID, int count, String buyerID) {
         if(goodExists(ID)){
             Good good = getGood(ID);
             if(good.count>=count){
@@ -157,21 +157,25 @@ public class DataBase {
         }
         return "The ID is wrong or the order doesn't exist anymore.";
     }
-
     public static void write(String fileName, DataBase dataBase) {
         Gson gson = new Gson();
-        new File(fileName);
-        try {
-            gson.toJson(dataBase,new FileWriter(fileName));
+        try (FileWriter writer = new FileWriter(fileName);){
+            gson.toJson(dataBase, writer);
+            writer.flush();
+            writer.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    public static void read(String fileName, DataBase dataBase) {
+    public static DataBase read(String fileName) {
         Gson gson = new Gson();
-        try {
-            dataBase = gson.fromJson(new FileReader(fileName),DataBase.class);
-        } catch (FileNotFoundException e) {
+        try (FileReader json = new FileReader(fileName)){
+            return gson.fromJson(json,DataBase.class);
+        }  catch (IOException e) {
+            e.printStackTrace();
         }
+        System.out.println("DIDNT READ");
+        return new DataBase();
     }
 }
