@@ -59,13 +59,12 @@ public class DataBase {
 
             if((user.ID).equals(s))
                 return true;
-            System.out.println(user.ID + " != " + s);
         }
         return false;
     }
     public User getUser(String s) {
         for (User user:users) {
-            if(user.ID == s)
+            if(user.ID.equals(s))
                 return user;
         }
         return new User();
