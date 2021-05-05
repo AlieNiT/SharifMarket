@@ -69,6 +69,7 @@ public class DataBase {
         }
         return new User();
     }
+
     boolean goodExists(String s){
         for (Good good:goods) {
             if(good.name.equals(s))
@@ -89,6 +90,18 @@ public class DataBase {
         Good good = new Good(s,initialCount,sellPrice,buyPrice);
         goods.add(good);
         return "add was successful -> good_id = "+good.ID;
+    }
+    public void showOrders(boolean history){
+        if (history)
+            for (Order order : ordersHistory)
+                System.out.println(order.count + " " +
+                        order.name + ", sell price:"+order.sellPrice+
+                        ", profit:"+(order.sellPrice-order.buyPrice));
+        else
+            for (Order order : ordersHistory)
+                System.out.println(order.count + " " + order.name + ", sell price:"+order.sellPrice+ ", profit:"+(order.sellPrice-order.buyPrice));
+
+
     }
     public ArrayList<Good> getGoods(){
         return goods;
@@ -130,7 +143,7 @@ public class DataBase {
         if(goodExists(ID)){
             Good good = getGood(ID);
             if(good.count>=count){
-                Order order = new Order(buyerID,ID,count,good.sellPrice,good.buyPrice);
+                Order order = new Order(buyerID,ID,count,good.sellPrice,good.buyPrice,good.name);
                 uncheckedOrders.add(order);
                 good.count -= count;
                 return "Your order id is = "+order.ID;
@@ -139,17 +152,20 @@ public class DataBase {
         }
         return "This ID is wrong or doesnt exist anymore";
     }
-    public String deleteOrder(int ID) {
-        //TODO
+    public String deleteOrder(int ID,String buyerID) {
         for (Order order: ordersHistory) {
-            if(order.ID == ID) {
+            if(order.ID == ID && buyerID.equals(order.buyer_ID)) {
                 ordersHistory.remove(order);
+                Good good = getGood(order.type_ID);
+                good.count += order.count;
                 return "order "+ID+" was deleted successfully!";
             }
         }
         for (Order order: uncheckedOrders) {
-            if(order.ID == ID){
+            if(order.ID == ID && buyerID.equals(order.buyer_ID)){
                 uncheckedOrders.remove(order);
+                Good good = getGood(order.type_ID);
+                good.count += order.count;
                 return "order "+ID+" was deleted successfully!";
             }
 
@@ -158,11 +174,9 @@ public class DataBase {
     }
     public static void write(String fileName, DataBase dataBase) {
         Gson gson = new Gson();
-        try (FileWriter writer = new FileWriter(fileName);){
+        try (FileWriter writer = new FileWriter(fileName)){
             gson.toJson(dataBase, writer);
             writer.flush();
-            writer.close();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
