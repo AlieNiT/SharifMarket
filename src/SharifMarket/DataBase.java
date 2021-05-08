@@ -2,14 +2,17 @@ package SharifMarket;
 import com.google.gson.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 public class DataBase {
     private ArrayList<Good> goods = new ArrayList<>();
-    public ArrayList<User> users = new ArrayList<>();
-    public ArrayList<Admin> admins = new ArrayList<>();
+    private ArrayList<User> users = new ArrayList<>();
+    private ArrayList<Admin> admins = new ArrayList<>();
     private ArrayList<Order> ordersHistory = new ArrayList<>();
     private ArrayList<Order> uncheckedOrders = new ArrayList<>();
     private int P = 0;
     private int S = 0;
+
     public ArrayList<Order> getUncheckedOrders(){ return uncheckedOrders; }
     public void checkOut(int ID){
         for (Order order : uncheckedOrders)
@@ -69,10 +72,9 @@ public class DataBase {
         }
         return new User();
     }
-
-    boolean goodExists(String s){
+    boolean goodExists(String name){
         for (Good good:goods) {
-            if(good.name.equals(s))
+            if(good.name.equals(name))
                 return true;
         }
         return false;
@@ -92,14 +94,16 @@ public class DataBase {
         return "add was successful -> good_id = "+good.ID;
     }
     public void showOrders(boolean history){
+        int i = 0;
         if (history)
-            for (Order order : ordersHistory)
-                System.out.println(order.count + " " +
-                        order.name + ", sell price:"+order.sellPrice+
-                        ", profit:"+(order.sellPrice-order.buyPrice));
+            for (Order order : ordersHistory) {
+                System.out.println(order.count + " " + order.name + ", sell price:" + order.sellPrice + ", profit:" + (order.sellPrice - order.buyPrice));
+            }
+
         else
-            for (Order order : ordersHistory)
-                System.out.println(order.count + " " + order.name + ", sell price:"+order.sellPrice+ ", profit:"+(order.sellPrice-order.buyPrice));
+            for (Order order : uncheckedOrders) {
+                System.out.println(order.count + " " + order.name + ", sell price:" + order.sellPrice + ", profit:" + (order.sellPrice - order.buyPrice) + "("+order.ID+")");
+            }
 
 
     }
@@ -120,8 +124,7 @@ public class DataBase {
         return "The ID is wrong.";
     }
     public String getSellProfit() {
-        //TODO
-        return "WTF AM I SUPPOSED TO SHOW TO U?";
+        return ordersHistory.size() + " Orders, " + S + " IRR sell, " + P + " IRR profit";
     }
     public String getSellProfit(int ID) {
         Good good = getGood(ID);
@@ -129,7 +132,7 @@ public class DataBase {
         int totalSells = 0;
         int sell = 0;
         int profit = 0;
-        for (Order order: ordersHistory) {
+        for (Order order : ordersHistory) {
             if(order.type_ID == ID){
                 orders += 1;
                 totalSells += order.count;
@@ -148,19 +151,11 @@ public class DataBase {
                 good.count -= count;
                 return "Your order id is = "+order.ID;
             }
-            return "Not enough in storage";
+            return "Not enough in storage(current balance:"+ good.count +")";
         }
         return "This ID is wrong or doesnt exist anymore";
     }
     public String deleteOrder(int ID,String buyerID) {
-        for (Order order: ordersHistory) {
-            if(order.ID == ID && buyerID.equals(order.buyer_ID)) {
-                ordersHistory.remove(order);
-                Good good = getGood(order.type_ID);
-                good.count += order.count;
-                return "order "+ID+" was deleted successfully!";
-            }
-        }
         for (Order order: uncheckedOrders) {
             if(order.ID == ID && buyerID.equals(order.buyer_ID)){
                 uncheckedOrders.remove(order);
@@ -168,10 +163,10 @@ public class DataBase {
                 good.count += order.count;
                 return "order "+ID+" was deleted successfully!";
             }
-
         }
         return "The ID is wrong or the order doesn't exist anymore.";
     }
+
     public static void write(String fileName, DataBase dataBase) {
         Gson gson = new Gson();
         try (FileWriter writer = new FileWriter(fileName)){
@@ -183,12 +178,11 @@ public class DataBase {
     }
     public static DataBase read(String fileName) {
         Gson gson = new Gson();
-        try (FileReader json = new FileReader(fileName)){
-            return gson.fromJson(json,DataBase.class);
+        try (FileReader fileReader = new FileReader(fileName)){
+            return gson.fromJson(fileReader,DataBase.class);
         }  catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("DIDNT READ");
         return new DataBase();
     }
 }
