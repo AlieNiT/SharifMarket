@@ -8,9 +8,9 @@ public class Order {
     String buyer_ID;
     int type_ID;
     int count;
-    String date;
     int sellPrice;
     int buyPrice;
+
     public Order(String buyer_ID, int type_ID, int count, int sellPrice, int buyPrice, String name) {
         this.name = name;
         this.buyer_ID = buyer_ID;
