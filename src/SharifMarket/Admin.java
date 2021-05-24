@@ -2,8 +2,8 @@ package SharifMarket;
 
 public class Admin {
 
-    String name;
-    String pass;
+    private String name;
+    private String pass;
     String ID;
 
 
@@ -15,4 +15,7 @@ public class Admin {
     public Admin() {
     }
 
+    public String getName() {
+        return name;
+    }
 }

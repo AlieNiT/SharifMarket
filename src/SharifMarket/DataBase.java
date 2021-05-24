@@ -186,8 +186,6 @@ public class DataBase {
             e.printStackTrace();
         }
     }
-
-
     public static DataBase read(String fileName) {
         Gson gson = new Gson();
 

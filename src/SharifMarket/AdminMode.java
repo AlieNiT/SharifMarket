@@ -37,7 +37,7 @@ public class AdminMode {
     }
 
     private void adminMode(Admin admin) {
-        System.out.println("Hello " + admin.name + ".");
+        System.out.println("Hello " + admin.getName() + ".");
         while (true) {
             try {
                 System.out.print("(admin mode)Please enter your command:");
@@ -58,8 +58,8 @@ public class AdminMode {
                     System.out.println(dataBase.addGood(cmd[2], Integer.parseInt(cmd[4]), Integer.parseInt(cmd[6]), Integer.parseInt(cmd[8])));
                 else if (cmd[0].equals("remove") && cmd[1].equals("-c"))
                     System.out.println(dataBase.removeGood(Integer.parseInt(cmd[2])));
-                else if (cmd[0].equals("edit") && dataBase.goodExists(Integer.parseInt(cmd[0]))) {
-                    Good good = dataBase.getGood(Integer.parseInt(cmd[0]));
+                else if (cmd[0].equals("edit") && dataBase.goodExists(Integer.parseInt(cmd[1]))) {
+                    Good good = dataBase.getGood(Integer.parseInt(cmd[1]));
                     for (int i = 2; i < cmd.length - 1; i++)
                         switch (cmd[i]) {
                             case "-n" -> good.setName(cmd[i + 1]);
@@ -77,7 +77,7 @@ public class AdminMode {
                         System.out.println(dataBase.getP(Integer.parseInt(cmd[3])) + " IRR");
                     else if (cmd[1].equals("-s") && cmd.length == 2)
                         System.out.println(dataBase.getSellProfit() + " IRR");
-                    else if (cmd[1].equals("-s") && cmd[2].equals("-c") && dataBase.goodExists(Integer.parseInt(cmd[4])))
+                    else if (cmd[1].equals("-s") && cmd[2].equals("-c") && dataBase.goodExists(Integer.parseInt(cmd[3])))
                         System.out.println(dataBase.getSellProfit(Integer.parseInt(cmd[3])) + " IRR");
                     else continue;
                 } else throw new Exception();
