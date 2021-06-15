@@ -10,7 +10,7 @@ public class Order {
     int count;
     int sellPrice;
     int buyPrice;
-
+    int tmp;
     public Order(String buyer_ID, int type_ID, int count, int sellPrice, int buyPrice, String name) {
         this.name = name;
         this.buyer_ID = buyer_ID;
